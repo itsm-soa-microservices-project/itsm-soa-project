@@ -1,0 +1,13 @@
+syntax = "proto3";
+package notification;
+
+service NotificationService {
+  rpc Ping(Empty) returns (NotificationResponse);
+}
+
+message Empty {}
+
+message NotificationResponse {
+  bool success = 1;
+  string message = 2;
+}

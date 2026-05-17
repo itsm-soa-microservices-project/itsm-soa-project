@@ -1,32 +1,35 @@
+const path = require("path");
 const grpc = require("@grpc/grpc-js");
 const protoLoader = require("@grpc/proto-loader");
 
-const packageDef = protoLoader.loadSync(
-  "../../proto/request.proto"
-);
+const PROTO_PATH = path.join(__dirname, "..", "..", "..", "proto", "request.proto");
+const packageDef = protoLoader.loadSync(PROTO_PATH, {
+  keepCase: true,
+  longs: String,
+  enums: String,
+  defaults: true,
+  oneofs: true,
+});
 
-const grpcObject =
-  grpc.loadPackageDefinition(packageDef);
+const grpcObject = grpc.loadPackageDefinition(packageDef).proto.request;
 
-const requestPackage = grpcObject.request;
-
-const client = new requestPackage.RequestService(
-  "localhost:5003",
+const client = new grpcObject.RequestService(
+  process.env.REQUEST_SERVICE_ADDR || "localhost:5003",
   grpc.credentials.createInsecure()
 );
 
 const createRequest = (data) => {
   return new Promise((resolve, reject) => {
-    client.CreateRequest(data, (err, response) => {
+    client.CreateRequest({ request: data }, (err, response) => {
       if (err) reject(err);
-      else resolve(response);
+      else resolve(response.request);
     });
   });
 };
 
 const getRequests = () => {
   return new Promise((resolve, reject) => {
-    client.GetRequests({}, (err, response) => {
+    client.ListRequests({}, (err, response) => {
       if (err) reject(err);
       else resolve(response.requests);
     });

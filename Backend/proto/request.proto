@@ -1,64 +1,59 @@
 syntax = "proto3";
-package proto.request;
 
+// Package name expected by the Node gRPC loader in this repo.
+package request;
+
+import "google/protobuf/empty.proto";
+
+// Représentation d'une demande de service (service request) dans l'ITSM.
+// - `id` : UUID sous forme de chaîne (le service utilise `crypto.randomUUID()`).
+// - `createdAt` / `updatedAt` : timestamps ISO stockés sous forme de chaîne.
 message Request {
-  int64 id = 1;
+  string id = 1;
   string title = 2;
   string description = 3;
-  string status = 4;
-  int64 requester_id = 5;
-  int64 assignee_id = 6;
-  int64 created_at = 7;
-  int64 updated_at = 8;
+  string category = 4;
+  Priority priority = 5;
+  Status status = 6;
+  string userId = 7;
+  string assigneeId = 8;
+  string createdAt = 9;
+  string updatedAt = 10;
+  map<string, string> metadata = 11;
 }
 
-message CreateRequestRequest {
-  Request request = 1;
+// Priorité de la demande
+enum Priority {
+  PRIORITY_UNSPECIFIED = 0;
+  LOW = 1;
+  MEDIUM = 2;
+  HIGH = 3;
+  URGENT = 4;
 }
 
-message CreateRequestResponse {
-  Request request = 1;
+// Statut métier d'une request (ouverture, traitement, fermeture, ...)
+enum Status {
+  STATUS_UNSPECIFIED = 0;
+  OPEN = 1;
+  PENDING = 2;
+  APPROVED = 3;
+  REJECTED = 4;
+  COMPLETED = 5;
+  CLOSED = 6;
 }
 
-message GetRequestRequest {
-  int64 id = 1;
-}
-
-message GetRequestResponse {
-  Request request = 1;
-}
-
-message ListRequestsRequest {
-  int32 page = 1;
-  int32 page_size = 2;
-  string status = 3;
-}
-
+// Réponse pour la récupération de plusieurs demandes
 message ListRequestsResponse {
   repeated Request requests = 1;
   int32 total = 2;
 }
 
-message UpdateRequestRequest {
-  Request request = 1;
-}
-
-message UpdateRequestResponse {
-  Request request = 1;
-}
-
-message DeleteRequestRequest {
-  int64 id = 1;
-}
-
-message DeleteRequestResponse {
-  bool success = 1;
-}
-
+// Service gRPC exposé par le request-service.
 service RequestService {
-  rpc CreateRequest(CreateRequestRequest) returns (CreateRequestResponse);
-  rpc GetRequest(GetRequestRequest) returns (GetRequestResponse);
-  rpc ListRequests(ListRequestsRequest) returns (ListRequestsResponse);
-  rpc UpdateRequest(UpdateRequestRequest) returns (UpdateRequestResponse);
-  rpc DeleteRequest(DeleteRequestRequest) returns (DeleteRequestResponse);
+  // Crée une nouvelle request et retourne l'objet créé.
+  rpc CreateRequest(Request) returns (Request);
+
+  // Récupère la liste des requests. L'appelant fournit `google.protobuf.Empty`.
+  // Le handler côté service renvoie un objet contenant la clé `requests`.
+  rpc GetRequests(google.protobuf.Empty) returns (ListRequestsResponse);
 }

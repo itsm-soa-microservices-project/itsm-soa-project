@@ -1,22 +1,44 @@
-const typeDefs = `
+const { gql } = require("graphql-tag");
+
+const typeDefs = gql`
+
   type User {
-    id: ID!
-    email: String
-    name: String
+    id: ID
+    username: String
   }
 
-  type AuthPayload {
-    token: String
-    user: User
+  type Request {
+    id: ID
+    title: String
+    status: String
+  }
+
+  type Incident {
+    id: ID
+    title: String
+    priority: String
   }
 
   type Query {
-    ping: String
+    getRequests: [Request]
+    getIncidents: [Incident]
   }
 
   type Mutation {
-    login(email: String!, password: String!): AuthPayload
-    register(email: String!, password: String!, name: String): AuthPayload
+    register(username: String, password: String): User
+    login(username: String, password: String): String
+
+    createRequest(
+      title: String,
+      description: String,
+      userId: String
+    ): Request
+
+    createIncident(
+      title: String,
+      description: String,
+      priority: String
+    ): Incident
   }
 `;
 

@@ -1,0 +1,65 @@
+
+syntax = "proto3";
+package proto.incident;
+
+message Incident {
+	int64 id = 1;
+	string title = 2;
+	string description = 3;
+	string status = 4;
+	int64 reporter_id = 5;
+	int64 assignee_id = 6;
+	int64 created_at = 7;
+	int64 updated_at = 8;
+}
+
+message CreateIncidentRequest {
+	Incident incident = 1;
+}
+
+message CreateIncidentResponse {
+	Incident incident = 1;
+}
+
+message GetIncidentRequest {
+	int64 id = 1;
+}
+
+message GetIncidentResponse {
+	Incident incident = 1;
+}
+
+message ListIncidentsRequest {
+	int32 page = 1;
+	int32 page_size = 2;
+	string status = 3;
+}
+
+message ListIncidentsResponse {
+	repeated Incident incidents = 1;
+	int32 total = 2;
+}
+
+message UpdateIncidentRequest {
+	Incident incident = 1;
+}
+
+message UpdateIncidentResponse {
+	Incident incident = 1;
+}
+
+message DeleteIncidentRequest {
+	int64 id = 1;
+}
+
+message DeleteIncidentResponse {
+	bool success = 1;
+}
+
+service IncidentService {
+	rpc CreateIncident(CreateIncidentRequest) returns (CreateIncidentResponse);
+	rpc GetIncident(GetIncidentRequest) returns (GetIncidentResponse);
+	rpc ListIncidents(ListIncidentsRequest) returns (ListIncidentsResponse);
+	rpc UpdateIncident(UpdateIncidentRequest) returns (UpdateIncidentResponse);
+	rpc DeleteIncident(DeleteIncidentRequest) returns (DeleteIncidentResponse);
+}

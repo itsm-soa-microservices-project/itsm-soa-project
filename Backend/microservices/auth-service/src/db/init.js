@@ -32,7 +32,7 @@ async function ensureUsersSchema() {
 
   const columns = await getExistingColumns();
   const expectedColumns = [
-    { name: "email", definition: "TEXT UNIQUE" },
+    { name: "email", definition: "TEXT" },
     { name: "name", definition: "TEXT" },
     { name: "created_at", definition: "INTEGER" },
     { name: "updated_at", definition: "INTEGER" },
@@ -43,6 +43,8 @@ async function ensureUsersSchema() {
       await runSql(`ALTER TABLE users ADD COLUMN ${column.name} ${column.definition};`);
     }
   }
+
+  await runSql("CREATE UNIQUE INDEX IF NOT EXISTS idx_users_email ON users(email);");
 }
 
 async function initDb() {

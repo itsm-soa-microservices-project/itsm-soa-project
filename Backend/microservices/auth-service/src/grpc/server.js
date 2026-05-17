@@ -3,7 +3,15 @@ const grpc = require("@grpc/grpc-js");
 const protoLoader = require("@grpc/proto-loader");
 const { Register, Login } = require("./handler");
 
-const PROTO_PATH = path.join(__dirname, "..", "..", "..", "..", "Backend", "proto", "auth.proto");
+const PROTO_PATH = path.join(
+  __dirname,
+  "..",
+  "..",
+  "..",
+  "..",
+  "proto",
+  "auth.proto"
+);
 const packageDefinition = protoLoader.loadSync(PROTO_PATH, {
   keepCase: true,
   longs: String,

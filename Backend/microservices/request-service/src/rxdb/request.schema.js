@@ -3,8 +3,11 @@ module.exports = {
   version: 0,
   description: "Schema for service requests",
   type: "object",
+
+  primaryKey: "id",
+
   properties: {
-    id: { type: "string" },
+    id: { type: "string", maxLength: 100 },
     title: { type: "string" },
     description: { type: "string" },
     category: { type: "string" },
@@ -15,6 +18,8 @@ module.exports = {
     createdAt: { type: "string" },
     updatedAt: { type: "string" }
   },
+
   required: ["id", "title", "description", "status", "userId", "createdAt", "updatedAt"],
+
   indexes: ["status", "userId"]
 };

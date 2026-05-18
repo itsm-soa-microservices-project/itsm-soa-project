@@ -1,16 +1,14 @@
-require('dotenv').config();
-const grpcServer = require('./src/grpc/server');
-const kafkaProducer = require('./src/kafka/producer');
+require("dotenv").config();
 
-const PORT = process.env.INCIDENT_SERVICE_PORT || 50052;
+const connectDB = require("./src/config/db");
+const startGrpc = require("./src/grpc/server");
 
-const start = async () => {
-  await kafkaProducer.connectProducer();
-  grpcServer.start(PORT);
-  console.log(`Incident service running on port ${PORT}`);
-};
+async function start() {
+  await connectDB();
+  await startGrpc();
+}
 
 start().catch((err) => {
-  console.error('Incident service failed to start', err);
+  console.error("Incident service failed to start:", err);
   process.exit(1);
 });

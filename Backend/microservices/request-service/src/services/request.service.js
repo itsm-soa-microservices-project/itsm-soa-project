@@ -1,18 +1,17 @@
 const requestModel = require("../models/request.model");
-const { randomUUID } = require("crypto");
 
 const createRequest = async (data) => {
   const request = {
-    id: randomUUID(),
+    id: String(Date.now() * 1000 + Math.floor(Math.random() * 1000)),
     title: data.title || "Untitled request",
     description: data.description || "",
     category: data.category || "GENERAL",
     priority: data.priority || "MEDIUM",
     status: "OPEN",
-    userId: data.userId || "anonymous",
-    assigneeId: data.assigneeId || "",
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString()
+    userId: data.userId || data.requester_id || data.requesterId || "anonymous",
+    assigneeId: data.assigneeId || data.assignee_id || data.assigneeId || "",
+    createdAt: Date.now(),
+    updatedAt: Date.now()
   };
 
   return requestModel.insertRequest(request);

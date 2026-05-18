@@ -1,17 +1,19 @@
-const authResolver =
-  require("./auth.resolver");
+const typeDefs = require("./typeDefs");
+const authResolver = require("../resolvers/auth.resolver");
+const requestResolver = require("../resolvers/request.resolver");
+const incidentResolver = require("../resolvers/incident.resolver");
 
-const requestResolver =
-  require("./request.resolver");
+const resolvers = {
+  Query: {
+    ...authResolver.Query,
+    ...requestResolver.Query,
+    ...incidentResolver.Query
+  },
+  Mutation: {
+    ...authResolver.Mutation,
+    ...requestResolver.Mutation,
+    ...incidentResolver.Mutation
+  }
+};
 
-const incidentResolver =
-  require("./incident.resolver");
-
-const { merge } = require("lodash");
-
-module.exports = merge(
-  {},
-  authResolver,
-  requestResolver,
-  incidentResolver
-);
+module.exports = { typeDefs, resolvers };

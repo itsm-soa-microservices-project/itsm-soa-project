@@ -1,5 +1,4 @@
-const requestClient =
-  require("../../grpc/clients/request.client");
+const requestClient = require("../../grpc-clients/request.client");
 
 const resolvers = {
   Query: {
@@ -10,7 +9,14 @@ const resolvers = {
 
   Mutation: {
     createRequest: async (_, args) => {
-      return await requestClient.createRequest(args);
+      const payload = {
+        title: args.title,
+        description: args.description,
+        category: args.category,
+        priority: args.priority,
+        requester_id: args.userId
+      };
+      return await requestClient.createRequest(payload);
     }
   }
 };

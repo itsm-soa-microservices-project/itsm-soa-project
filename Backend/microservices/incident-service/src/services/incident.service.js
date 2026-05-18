@@ -1,65 +1,81 @@
-let incidents = [];
-let nextId = 1;
+﻿const Incident = require("../models/incident.model");
 
-const createIncident = async (incidentData = {}) => {
-  const incident = {
-    id: nextId++,
-    title: incidentData.title || '',
-    description: incidentData.description || '',
-    status: incidentData.status || 'OPEN',
-    reporter_id: incidentData.reporter_id || 0,
-    assignee_id: incidentData.assignee_id || 0,
-    created_at: Date.now(),
-    updated_at: Date.now()
+const formatIncident = (incident) => {
+  if (!incident) return null;
+
+  return {
+    id: incident._id.toString(),
+    title: incident.title || "",
+    description: incident.description || "",
+    status: incident.status || "OPEN",
+    priority: incident.priority || "MEDIUM",
+    reporterId: incident.reporterId || "",
+    assigneeId: incident.assigneeId || "",
+    createdAt: incident.createdAt ? incident.createdAt.getTime() : 0,
+    updatedAt: incident.updatedAt ? incident.updatedAt.getTime() : 0
   };
-  incidents.push(incident);
-  return incident;
+};
+
+const createIncident = async (incidentData) => {
+  const payload = {
+    title: incidentData.title,
+    description: incidentData.description || "",
+    status: incidentData.status || "OPEN",
+    priority: incidentData.priority || "MEDIUM",
+    reporterId: incidentData.reporterId || incidentData.reporter_id || "",
+    assigneeId: incidentData.assigneeId || incidentData.assignee_id || ""
+  };
+
+  const incident = await Incident.create(payload);
+  return formatIncident(incident);
 };
 
 const getIncidentById = async (id) => {
-  return incidents.find((incident) => Number(incident.id) === Number(id)) || null;
+  const incident = await Incident.findById(id);
+  return formatIncident(incident);
 };
 
-const listIncidents = async ({ page = 1, pageSize = 10, status } = {}) => {
-  let filtered = incidents;
-  if (status) {
-    filtered = filtered.filter((incident) => incident.status === status);
-  }
+const listIncidents = async ({ page = 1, pageSize = 20, status } = {}) => {
+  const query = {};
+  if (status) query.status = status;
 
-  const startIndex = (page - 1) * pageSize;
-  const pagedIncidents = filtered.slice(startIndex, startIndex + pageSize);
+  const skip = (page - 1) * pageSize;
+  const [incidents, total] = await Promise.all([
+    Incident.find(query).sort({ createdAt: -1 }).skip(skip).limit(pageSize),
+    Incident.countDocuments(query)
+  ]);
 
   return {
-    incidents: pagedIncidents,
-    total: filtered.length
+    incidents: incidents.map(formatIncident),
+    total
   };
 };
 
-const updateIncident = async (incidentData = {}) => {
-  const existing = await getIncidentById(incidentData.id);
-  if (!existing) {
+const updateIncident = async (incidentData) => {
+  const id = incidentData.id || incidentData._id;
+  const updatePayload = {};
+
+  if (incidentData.title !== undefined) updatePayload.title = incidentData.title;
+  if (incidentData.description !== undefined) updatePayload.description = incidentData.description;
+  if (incidentData.status !== undefined) updatePayload.status = incidentData.status;
+  if (incidentData.priority !== undefined) updatePayload.priority = incidentData.priority;
+  if (incidentData.reporterId !== undefined) updatePayload.reporterId = incidentData.reporterId;
+  if (incidentData.reporter_id !== undefined) updatePayload.reporterId = incidentData.reporter_id;
+  if (incidentData.assigneeId !== undefined) updatePayload.assigneeId = incidentData.assigneeId;
+  if (incidentData.assignee_id !== undefined) updatePayload.assigneeId = incidentData.assignee_id;
+
+  if (Object.keys(updatePayload).length === 0) {
     return null;
   }
 
-  Object.assign(existing, {
-    title: incidentData.title || existing.title,
-    description: incidentData.description || existing.description,
-    status: incidentData.status || existing.status,
-    reporter_id: incidentData.reporter_id || existing.reporter_id,
-    assignee_id: incidentData.assignee_id || existing.assignee_id,
-    updated_at: Date.now()
-  });
-
-  return existing;
+  updatePayload.updatedAt = Date.now();
+  const incident = await Incident.findByIdAndUpdate(id, updatePayload, { new: true });
+  return formatIncident(incident);
 };
 
 const deleteIncident = async (id) => {
-  const index = incidents.findIndex((incident) => Number(incident.id) === Number(id));
-  if (index === -1) {
-    return false;
-  }
-  incidents.splice(index, 1);
-  return true;
+  const deleted = await Incident.findByIdAndDelete(id);
+  return !!deleted;
 };
 
 module.exports = {

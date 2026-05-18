@@ -15,8 +15,8 @@ module.exports = {
     status: { type: "string" },
     userId: { type: "string" },
     assigneeId: { type: "string" },
-    createdAt: { type: "string" },
-    updatedAt: { type: "string" }
+    createdAt: { type: "number" },
+    updatedAt: { type: "number" }
   },
 
   required: ["id", "title", "description", "status", "userId", "createdAt", "updatedAt"],

@@ -1,5 +1,4 @@
-const incidentClient =
-  require("../../grpc/clients/incident.client");
+﻿const incidentClient = require("../../grpc-clients/incident.client");
 
 const resolvers = {
   Query: {
@@ -7,7 +6,6 @@ const resolvers = {
       return await incidentClient.getIncidents();
     }
   },
-
   Mutation: {
     createIncident: async (_, args) => {
       return await incidentClient.createIncident(args);

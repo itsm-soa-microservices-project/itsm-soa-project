@@ -1,7 +1,7 @@
 const path = require("path");
 const grpc = require("@grpc/grpc-js");
 const protoLoader = require("@grpc/proto-loader");
-const { Register, Login } = require("./handler");
+const { Register, Login, VerifyToken } = require("./handler");
 
 const PROTO_PATH = path.join(
   __dirname,
@@ -25,7 +25,7 @@ const authProto = grpc.loadPackageDefinition(packageDefinition).proto.auth;
 function startGrpcServer() {
   return new Promise((resolve, reject) => {
     const server = new grpc.Server();
-    server.addService(authProto.AuthService.service, { Register, Login });
+    server.addService(authProto.AuthService.service, { Register, Login, VerifyToken });
 
     const port = process.env.PORT || "50051";
     const address = `0.0.0.0:${port}`;

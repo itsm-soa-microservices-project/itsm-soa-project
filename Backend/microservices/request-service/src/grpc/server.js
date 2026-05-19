@@ -17,7 +17,10 @@ const server = new grpc.Server();
 
 server.addService(requestPackage.RequestService.service, {
   CreateRequest: handler.createRequest,
-  ListRequests: handler.listRequests
+  GetRequest: handler.getRequest,
+  ListRequests: handler.listRequests,
+  UpdateRequest: handler.updateRequest,
+  DeleteRequest: handler.deleteRequest
 });
 
 const startGrpcServer = () => {

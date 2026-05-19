@@ -10,7 +10,9 @@ const buildGrpcRequest = (request) => ({
   requester_id: String(request.userId || request.requester_id || "0"),
   assignee_id: String(request.assigneeId || request.assignee_id || "0"),
   created_at: String(request.createdAt ? new Date(request.createdAt).valueOf() : request.created_at || "0"),
-  updated_at: String(request.updatedAt ? new Date(request.updatedAt).valueOf() : request.updated_at || "0")
+  updated_at: String(request.updatedAt ? new Date(request.updatedAt).valueOf() : request.updated_at || "0"),
+  category: request.category || "",
+  priority: request.priority || ""
 });
 
 const createRequest = async (call, callback) => {
@@ -63,7 +65,60 @@ const listRequests = async (_, callback) => {
   }
 };
 
+const getRequest = async (call, callback) => {
+  try {
+    const id = call?.request?.id;
+    if (!id) {
+      return callback({ code: grpc.status.INVALID_ARGUMENT, message: "Request id is required" }, null);
+    }
+
+    const request = await requestService.getRequestById(id);
+    if (!request) {
+      return callback({ code: grpc.status.NOT_FOUND, message: "Request not found" }, null);
+    }
+
+    callback(null, { request: buildGrpcRequest(request) });
+  } catch (err) {
+    callback({ code: grpc.status.INTERNAL, message: err.message || "Internal server error" }, null);
+  }
+};
+
+const updateRequest = async (call, callback) => {
+  try {
+    const requestData = call?.request?.request;
+    if (!requestData || typeof requestData !== "object" || !requestData.id) {
+      return callback({ code: grpc.status.INVALID_ARGUMENT, message: "UpdateRequestRequest must include a valid request with id" }, null);
+    }
+
+    const request = await requestService.updateRequest(requestData);
+    if (!request) {
+      return callback({ code: grpc.status.NOT_FOUND, message: "Request not found" }, null);
+    }
+
+    callback(null, { request: buildGrpcRequest(request) });
+  } catch (err) {
+    callback({ code: grpc.status.INTERNAL, message: err.message || "Internal server error" }, null);
+  }
+};
+
+const deleteRequest = async (call, callback) => {
+  try {
+    const id = call?.request?.id;
+    if (!id) {
+      return callback({ code: grpc.status.INVALID_ARGUMENT, message: "Request id is required" }, null);
+    }
+
+    const success = await requestService.deleteRequest(id);
+    callback(null, { success });
+  } catch (err) {
+    callback({ code: grpc.status.INTERNAL, message: err.message || "Internal server error" }, null);
+  }
+};
+
 module.exports = {
   createRequest,
-  listRequests
+  listRequests,
+  getRequest,
+  updateRequest,
+  deleteRequest
 };

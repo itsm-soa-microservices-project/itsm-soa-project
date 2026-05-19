@@ -21,7 +21,39 @@ const getRequests = async () => {
   return requestModel.findAllRequests();
 };
 
+const getRequestById = async (id) => {
+  return requestModel.findRequestById(id);
+};
+
+const updateRequest = async (data) => {
+  if (!data?.id) {
+    throw new Error("Request id is required");
+  }
+
+  const patch = {
+    ...(data.title !== undefined && { title: data.title }),
+    ...(data.description !== undefined && { description: data.description }),
+    ...(data.category !== undefined && { category: data.category }),
+    ...(data.priority !== undefined && { priority: data.priority }),
+    ...(data.status !== undefined && { status: data.status }),
+    ...(data.requester_id !== undefined && { userId: String(data.requester_id) }),
+    ...(data.requesterId !== undefined && { userId: String(data.requesterId) }),
+    ...(data.assignee_id !== undefined && { assigneeId: String(data.assignee_id) }),
+    ...(data.assigneeId !== undefined && { assigneeId: String(data.assigneeId) }),
+    updatedAt: Date.now()
+  };
+
+  return requestModel.updateRequest(data.id, patch);
+};
+
+const deleteRequest = async (id) => {
+  return requestModel.deleteRequest(id);
+};
+
 module.exports = {
   createRequest,
-  getRequests
+  getRequests,
+  getRequestById,
+  updateRequest,
+  deleteRequest
 };

@@ -1,0 +1,461 @@
+{
+  "info": {
+    "_postman_id": "itsm-soa-project-collection",
+    "name": "ITSM SOA Project - Complete API Tests",
+    "description": "Collection complète pour tester tous les endpoints du projet ITSM SOA",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "REST API",
+      "item": [
+        {
+          "name": "Auth - Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.environment.set('token', jsonData.token);",
+                  "    console.log('Token sauvegardé:', jsonData.token);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"user@example.com\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:3000/auth/login",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "auth",
+                "login"
+              ]
+            },
+            "description": "Login avec email et password. Le token sera automatiquement sauvegardé."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "GraphQL - Auth",
+      "item": [
+        {
+          "name": "Query - Ping",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"{ ping }\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:3000/graphql",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "graphql"
+              ]
+            },
+            "description": "Test simple pour vérifier que GraphQL fonctionne"
+          },
+          "response": []
+        },
+        {
+          "name": "Mutation - Register",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    var jsonData = pm.response.json();",
+                  "    if (jsonData.data && jsonData.data.register && jsonData.data.register.token) {",
+                  "        pm.environment.set('token', jsonData.data.register.token);",
+                  "        console.log('Nouvel utilisateur créé et token sauvegardé');",
+                  "    }",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"mutation { register(email: \\\"newuser@example.com\\\", password: \\\"password123\\\", name: \\\"Jane Doe\\\") { token user { id email name roles } } }\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:3000/graphql",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "graphql"
+              ]
+            },
+            "description": "Enregistrer un nouvel utilisateur"
+          },
+          "response": []
+        },
+        {
+          "name": "Mutation - Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    var jsonData = pm.response.json();",
+                  "    if (jsonData.data && jsonData.data.login && jsonData.data.login.token) {",
+                  "        pm.environment.set('token', jsonData.data.login.token);",
+                  "        console.log('Connecté avec succès');",
+                  "    }",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"mutation { login(email: \\\"user@example.com\\\", password: \\\"password123\\\") { token user { id email name roles } } }\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:3000/graphql",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "graphql"
+              ]
+            },
+            "description": "Se connecter avec email et password"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "GraphQL - Incidents",
+      "item": [
+        {
+          "name": "Mutation - Create Incident",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    var jsonData = pm.response.json();",
+                  "    if (jsonData.data && jsonData.data.createIncident) {",
+                  "        pm.environment.set('incident_id', jsonData.data.createIncident.id);",
+                  "        console.log('Incident créé avec l\\'ID:', jsonData.data.createIncident.id);",
+                  "    }",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"mutation { createIncident(title: \\\"Server Down\\\", description: \\\"Main server is not responding\\\", priority: \\\"HIGH\\\") { id title description status priority createdAt } }\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:3000/graphql",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "graphql"
+              ]
+            },
+            "description": "Créer un nouvel incident. L'ID sera sauvegardé pour utilisation ultérieure."
+          },
+          "response": []
+        },
+        {
+          "name": "Query - Get All Incidents",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"query { getIncidents { id title description status priority reporterId assigneeId createdAt } }\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:3000/graphql",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "graphql"
+              ]
+            },
+            "description": "Récupérer tous les incidents"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "GraphQL - Requests",
+      "item": [
+        {
+          "name": "Mutation - Create Request",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    var jsonData = pm.response.json();",
+                  "    if (jsonData.data && jsonData.data.createRequest) {",
+                  "        pm.environment.set('request_id', jsonData.data.createRequest.id);",
+                  "        console.log('Demande créée avec l\\'ID:', jsonData.data.createRequest.id);",
+                  "    }",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"mutation { createRequest(title: \\\"Upgrade RAM\\\", description: \\\"Need to upgrade server RAM to 64GB\\\", category: \\\"HARDWARE\\\", priority: \\\"MEDIUM\\\", userId: \\\"1\\\") { id title description category priority status createdAt } }\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:3000/graphql",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "graphql"
+              ]
+            },
+            "description": "Créer une nouvelle demande. L'ID sera sauvegardé."
+          },
+          "response": []
+        },
+        {
+          "name": "Query - Get All Requests",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"query { getRequests { id title description category priority status userId assigneeId createdAt } }\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:3000/graphql",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "graphql"
+              ]
+            },
+            "description": "Récupérer toutes les demandes"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "gRPC Tests (via grpcurl)",
+      "item": [
+        {
+          "name": "Auth Service - List Methods",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:5001/",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "5001"
+            },
+            "description": "Commande: grpcurl -plaintext localhost:5001 list"
+          },
+          "response": []
+        },
+        {
+          "name": "Incident Service - Register",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:5002/",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "5002"
+            },
+            "description": "Commande: grpcurl -plaintext localhost:5002 list"
+          },
+          "response": []
+        },
+        {
+          "name": "Request Service - List Methods",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:5003/",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "5003"
+            },
+            "description": "Commande: grpcurl -plaintext localhost:5003 list"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "System Checks",
+      "item": [
+        {
+          "name": "API Gateway Health",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3000/",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000"
+            },
+            "description": "Vérifier que l'API Gateway est accessible"
+          },
+          "response": []
+        },
+        {
+          "name": "Kafka UI (Kafdrop)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:9000/",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "9000"
+            },
+            "description": "Accéder à l'interface Kafdrop pour visualiser Kafka"
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "incident_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "request_id",
+      "value": "",
+      "type": "string"
+    }
+  ]
+}
